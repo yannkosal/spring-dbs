@@ -30,7 +30,7 @@ public class Account {
     private String email;
 
     @Column(nullable = false)
-    private String phoneNumber;
+    private String number;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

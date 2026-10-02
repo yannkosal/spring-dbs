@@ -17,7 +17,7 @@ public class AccountResponse {
     private String accountNumber;
     private String accountHolderName;
     private String email;
-    private String phoneNumber;
+    private String number;
     private AccountType accountType;
     private AccountStatus accountStatus;
     private BigDecimal balance;

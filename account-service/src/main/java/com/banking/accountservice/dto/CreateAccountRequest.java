@@ -24,7 +24,7 @@ public class CreateAccountRequest {
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    private String phoneNumber;
+    private String number;
 
     @NotNull(message = "Account type is required")
     private AccountType accountType;

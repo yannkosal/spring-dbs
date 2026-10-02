@@ -31,7 +31,7 @@ public class AccountService {
         Account account = new Account();
         account.setAccountHolderName(request.getAccountHolderName());
         account.setEmail(request.getEmail());
-        account.setPhoneNumber(request.getPhoneNumber());
+        account.setNumber(request.getNumber());
         account.setAccountType(request.getAccountType());
         account.setAccountStatus(AccountStatus.ACTIVE);
         account.setBalance(request.getInitialDeposit());
@@ -92,7 +92,7 @@ public class AccountService {
      * @param amount
      */
     public void deductBalance(String accountNumber, BigDecimal amount) {
-        log.info("Deducting balance {} from account: {}", accountNumber);
+        log.info("Deducting balance {} from account: {}", accountNumber, amount);
 
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -145,7 +145,7 @@ public class AccountService {
         response.setAccountNumber(account.getAccountNumber());
         response.setAccountHolderName(account.getAccountHolderName());
         response.setEmail(account.getEmail());
-        response.setPhoneNumber(account.getPhoneNumber());
+        response.setNumber(account.getNumber());
         response.setAccountType(account.getAccountType());
         response.setAccountStatus(account.getAccountStatus());
         response.setBalance(account.getBalance());
