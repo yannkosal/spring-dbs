@@ -30,7 +30,7 @@ public class PaymentService {
     @Value("${razorpay.key-id}")
     private String keyId;
 
-    @Value("${razorpay.key-id}")
+    @Value("${razorpay.key-secret}")
     private String keySecret;
 
     private static final String PAYMENT_COMPLETED_TOPIC = "payment.completed";
