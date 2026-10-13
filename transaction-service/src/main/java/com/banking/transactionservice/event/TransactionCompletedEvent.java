@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TransactionCompletedEvent {
     private String transactionId;
-    private String senderAmountNumber;
-    private String receiverAmountNumber;
+    private String senderAccountNumber;
+    private String receiverAccountNumber;
     private BigDecimal amount;
     private String description;
 }

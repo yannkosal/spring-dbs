@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
@@ -13,34 +12,33 @@ import java.util.Map;
 public class NotificationService {
 
     @KafkaListener(topics = "transaction.otp.generated")
-    public void consumeOtpGenerated(@PathVariable Map<String, Object> payload) {
+    public void consumeOtpGenerated(@Payload Map<String, Object> payload) {
         try {
-            String accountNumber = (String) payload.get("accountNumber");
-            String otp = (String) payload.get("otp");
-            String transactionId = (String) payload.get("transactionId");
-            String amount = (String) payload.get("amount");
-            String reason = (String) payload.get("reason");
+            String accountNumber = value(payload, "accountNumber");
+            String otp = value(payload, "otp");
+            String amount = value(payload, "amount");
+            String reason = value(payload, "reason");
 
             sendAlert(accountNumber,
                     "TRANSACTION VERIFICATION REQUIRED",
                     String.format("Suspicious activity detected on your account. "
-                            + "Reason: %s "
-                            + "A transaction of %s is pending verification. "
-                            + "Your OTP is: %s. Valid for 5 minutes. "
-                            + "If this wasn't you - ignore this message. ",
+                                    + "Reason: %s "
+                                    + "A transaction of %s is pending verification. "
+                                    + "Your OTP is: %s. Valid for 5 minutes. "
+                                    + "If this wasn't you - ignore this message. ",
                             reason, amount, otp
                     ));
         } catch (Exception e) {
-            log.error("Error sending OTP notification: {}", e.getMessage());
+            log.error("Error sending OTP notification", e);
         }
     }
 
     @KafkaListener(topics = "transaction.completed")
     public void consumeTransactionCompleted(@Payload Map<String, Object> payload) {
         try {
-            String senderAccount = (String) payload.get("senderAccount");
-            String receiverAccount = (String) payload.get("receiverAccount");
-            String amount = (String) payload.get("amount");
+            String senderAccount = value(payload, "senderAccountNumber");
+            String receiverAccount = value(payload, "receiverAccountNumber");
+            String amount = value(payload, "amount");
 
             // DEBIT ALERT
             sendAlert(senderAccount, "DEBIT ALERT", String.format(
@@ -50,7 +48,7 @@ public class NotificationService {
             sendAlert(receiverAccount, "CREDIT ALERT", String.format(
                     "%s credit from account %s", amount, receiverAccount));
         } catch (Exception e) {
-            log.error("Error sending transaction notification: {}", e.getMessage());
+            log.error("Error sending transaction notification", e);
         }
     }
 
@@ -71,15 +69,15 @@ public class NotificationService {
     @KafkaListener(topics = "transaction.refund")
     public void consumeTransactionRefunded(@Payload Map<String, Object> payload) {
         try {
-            String senderAccount = (String) payload.get("senderAccount");
-            String amount = (String) payload.get("amount");
-            String reason = (String) payload.get("reason");
+            String senderAccount = value(payload, "senderAccountNumber");
+            String amount = value(payload, "amount");
+            String reason = value(payload, "reason");
 
             sendAlert(senderAccount, "REFUND PROCESSED", String.format(
                     "Your transaction of %s was cancelled." + "Reason: %s" + "%s has been refunded to account %s.",
                     amount, reason, amount, senderAccount));
         } catch (Exception e) {
-            log.error("Error sending refund notification: {}", e.getMessage());
+            log.error("Error sending refund notification", e);
         }
     }
 
@@ -116,5 +114,13 @@ public class NotificationService {
         log.info("Subject: {}", subject);
         log.info("Message: {}", message);
         log.info("--------------------------------------");
+    }
+
+    private String value(Map<String, Object> payload, String key) {
+        Object value = payload.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing notification field: " + key);
+        }
+        return value.toString();
     }
 }

@@ -91,7 +91,7 @@ public class FraudDetectionService {
                     true, "Transaction exceed 90% of account balance"
             );
         }
-        return new FraudCheckResult(true, null);
+        return new FraudCheckResult(false, null);
     }
 
     private boolean isVelocityExceeded(String accountNumber) {
